@@ -51,7 +51,7 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6 p-6 pb-16">
+      <div className="space-y-6 p-6 pb-16 max-w-4xl mx-auto">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">
