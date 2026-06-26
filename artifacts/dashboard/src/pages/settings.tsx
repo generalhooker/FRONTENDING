@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTheme } from "@/lib/theme";
 import { AppLayout } from "@/components/dashboard/app-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,6 +25,7 @@ const BANNER_COLORS = [
 ];
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [name, setName] = useState("Admin");
   const [bio, setBio] = useState("");
   const [bannerImage, setBannerImage] = useState<string | null>(null);
@@ -305,14 +307,18 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label>Theme</Label>
                 <div className="grid grid-cols-3 gap-4">
-                  {["Light", "Dark", "System"].map((theme) => (
-                    <div key={theme} className="space-y-2">
-                      <div className={`rounded-md border-2 p-2 cursor-pointer hover:border-primary transition-colors ${theme === "Light" ? "border-primary" : "border-muted"}`}>
-                        <div className={`rounded h-16 ${theme === "Dark" ? "bg-zinc-900" : theme === "System" ? "bg-gradient-to-r from-white to-zinc-900" : "bg-white border"}`} />
+                  {(["light", "dark", "system"] as const).map((t) => {
+                    const label = t.charAt(0).toUpperCase() + t.slice(1);
+                    const isActive = theme === t;
+                    return (
+                      <div key={t} className="space-y-2" onClick={() => setTheme(t)}>
+                        <div className={`rounded-md border-2 p-2 cursor-pointer hover:border-primary transition-colors ${isActive ? "border-primary" : "border-muted"}`}>
+                          <div className={`rounded h-16 ${t === "dark" ? "bg-zinc-900" : t === "system" ? "bg-gradient-to-r from-white to-zinc-900" : "bg-white border"}`} />
+                        </div>
+                        <p className={`text-xs text-center font-medium ${isActive ? "text-primary" : ""}`}>{label}</p>
                       </div>
-                      <p className="text-xs text-center font-medium">{theme}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
