@@ -50,6 +50,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { VisitorsChart } from "@/components/dashboard/visitors-chart";
+import { CommandMenu } from "@/components/dashboard/command-menu";
 
 const navMain = [
   { icon: LayoutDashboard, label: "Dashboard", active: true },
@@ -213,6 +214,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Documents</span>
             </div>
+            <CommandMenu />
             <Button variant="outline" size="sm" className="gap-2">
               <Github className="h-3.5 w-3.5" />
               GitHub
