@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme";
 import NotFound from "@/pages/not-found";
 import DashboardPage from "@/pages/dashboard";
 import SettingsPage from "@/pages/settings";
+import ProfilePage from "@/pages/profile";
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ function Router() {
     <Switch>
       <Route path="/" component={DashboardPage} />
       <Route path="/settings" component={SettingsPage} />
+      <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );
