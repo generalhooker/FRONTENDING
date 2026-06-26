@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ImagePlus, Pencil, X } from "lucide-react";
+import { Camera, ImagePlus, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BANNER_COLORS = [
@@ -23,70 +23,13 @@ const BANNER_COLORS = [
   "#ED4245", "#1ABC9C", "#E67E22", "#9B59B6",
 ];
 
-function ProfilePreview({
-  name,
-  bio,
-  bannerImage,
-  bannerColor,
-  avatarImage,
-}: {
-  name: string;
-  bio: string;
-  bannerImage: string | null;
-  bannerColor: string;
-  avatarImage: string | null;
-}) {
-  return (
-    <div className="rounded-xl overflow-hidden border bg-card shadow-lg w-full max-w-xs">
-      <div
-        className="h-24 relative"
-        style={
-          bannerImage
-            ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-            : { backgroundColor: bannerColor }
-        }
-      />
-      <div className="px-4 pb-4">
-        <div className="relative -mt-10 mb-3 w-fit">
-          <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
-            {avatarImage ? (
-              <AvatarImage src={avatarImage} />
-            ) : null}
-            <AvatarFallback className="text-xl rounded-full">
-              {name ? name.slice(0, 2).toUpperCase() : "AD"}
-            </AvatarFallback>
-            <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
-          </Avatar>
-        </div>
-        <div className="space-y-1">
-          <p className="font-bold text-base leading-none">{name || "Admin"}</p>
-          <p className="text-xs text-muted-foreground">admin@acme.com</p>
-        </div>
-        {bio && (
-          <>
-            <Separator className="my-3" />
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">About me</p>
-              <p className="text-xs text-foreground leading-relaxed line-clamp-4">{bio}</p>
-            </div>
-          </>
-        )}
-        <Separator className="my-3" />
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-          <span className="text-xs text-muted-foreground">Online</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function SettingsPage() {
   const [name, setName] = useState("Admin");
   const [bio, setBio] = useState("");
   const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [bannerColor, setBannerColor] = useState(BANNER_COLORS[0]);
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -94,15 +37,16 @@ export default function SettingsPage() {
   function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setBannerImage(url);
+    setBannerImage(URL.createObjectURL(file));
+    setShowColorPicker(false);
+    e.target.value = "";
   }
 
   function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setAvatarImage(url);
+    setAvatarImage(URL.createObjectURL(file));
+    e.target.value = "";
   }
 
   return (
@@ -134,166 +78,180 @@ export default function SettingsPage() {
             </div>
             <Separator />
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8">
-              {/* Form */}
-              <div className="space-y-6">
-                {/* Banner */}
-                <div className="grid gap-2">
-                  <Label>Banner</Label>
-                  <div
-                    className="relative h-32 rounded-lg overflow-hidden border cursor-pointer group"
-                    style={
-                      bannerImage
-                        ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-                        : { backgroundColor: bannerColor }
-                    }
-                    onClick={() => bannerInputRef.current?.click()}
-                  >
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                      <Button size="sm" variant="secondary" type="button" onClick={(e) => { e.stopPropagation(); bannerInputRef.current?.click(); }}>
-                        <ImagePlus className="h-4 w-4 mr-1" /> Upload image
-                      </Button>
-                      {bannerImage && (
-                        <Button size="sm" variant="destructive" type="button" onClick={(e) => { e.stopPropagation(); setBannerImage(null); }}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <input
-                      ref={bannerInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleBannerUpload}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-muted-foreground">Or pick a color:</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {BANNER_COLORS.map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          className={cn(
-                            "h-7 w-7 rounded-full border-2 transition-transform hover:scale-110",
-                            bannerColor === color && !bannerImage ? "border-foreground scale-110" : "border-transparent"
-                          )}
-                          style={{ backgroundColor: color }}
-                          onClick={() => { setBannerColor(color); setBannerImage(null); }}
-                        />
-                      ))}
-                      <label className="h-7 w-7 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-foreground transition-colors" title="Custom color">
-                        <Pencil className="h-3 w-3 text-muted-foreground" />
-                        <input
-                          type="color"
-                          className="sr-only"
-                          value={bannerColor}
-                          onChange={(e) => { setBannerColor(e.target.value); setBannerImage(null); }}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 items-start">
 
-                {/* Avatar */}
-                <div className="grid gap-2">
-                  <Label>Profile picture</Label>
-                  <div className="flex items-center gap-4">
-                    <div className="relative group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
-                      <Avatar className="h-16 w-16">
-                        {avatarImage ? <AvatarImage src={avatarImage} /> : null}
-                        <AvatarFallback className="text-lg">
-                          {name ? name.slice(0, 2).toUpperCase() : "AD"}
-                        </AvatarFallback>
-                        <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
-                      </Avatar>
-                      <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Pencil className="h-4 w-4 text-white" />
-                      </div>
-                      <input
-                        ref={avatarInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarUpload}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Upload a photo</p>
-                      <p className="text-xs text-muted-foreground">JPG, GIF or PNG. Max size 1MB.</p>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" type="button" onClick={() => avatarInputRef.current?.click()}>
-                          Change picture
-                        </Button>
-                        {avatarImage && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => setAvatarImage(null)}>
-                            Remove
-                          </Button>
+              {/* Profile Card — editable preview */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Profile card</p>
+                <p className="text-xs text-muted-foreground">Click to edit directly.</p>
+
+                <div className="rounded-xl overflow-visible border bg-card shadow-lg w-72">
+                  {/* Banner — clickable to edit */}
+                  <div className="relative">
+                    <div
+                      className="h-28 rounded-t-xl cursor-pointer group relative overflow-hidden"
+                      style={
+                        bannerImage
+                          ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                          : { backgroundColor: bannerColor }
+                      }
+                      onClick={() => setShowColorPicker((v) => !v)}
+                    >
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                        <button
+                          type="button"
+                          className="bg-black/60 text-white rounded-md px-2 py-1 text-xs flex items-center gap-1 hover:bg-black/80 transition"
+                          onClick={(e) => { e.stopPropagation(); bannerInputRef.current?.click(); }}
+                        >
+                          <ImagePlus className="h-3 w-3" /> Upload
+                        </button>
+                        <button
+                          type="button"
+                          className="bg-black/60 text-white rounded-md px-2 py-1 text-xs flex items-center gap-1 hover:bg-black/80 transition"
+                          onClick={(e) => { e.stopPropagation(); setShowColorPicker((v) => !v); }}
+                        >
+                          <Pencil className="h-3 w-3" /> Color
+                        </button>
+                        {bannerImage && (
+                          <button
+                            type="button"
+                            className="bg-black/60 text-white rounded-full p-1 hover:bg-black/80 transition"
+                            onClick={(e) => { e.stopPropagation(); setBannerImage(null); }}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
                         )}
                       </div>
+                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                    </div>
+
+                    {/* Color picker popover */}
+                    {showColorPicker && (
+                      <div className="absolute left-2 top-full mt-2 z-50 bg-popover border rounded-lg p-3 shadow-xl space-y-2 w-64">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Banner color</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {BANNER_COLORS.map((color) => (
+                            <button
+                              key={color}
+                              type="button"
+                              className={cn(
+                                "h-8 w-8 rounded-full border-2 transition-transform hover:scale-110",
+                                bannerColor === color && !bannerImage ? "border-foreground scale-110" : "border-transparent"
+                              )}
+                              style={{ backgroundColor: color }}
+                              onClick={() => { setBannerColor(color); setBannerImage(null); }}
+                            />
+                          ))}
+                          <label
+                            className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-foreground transition-colors"
+                            title="Custom color"
+                          >
+                            <Pencil className="h-3 w-3 text-muted-foreground" />
+                            <input
+                              type="color"
+                              className="sr-only"
+                              value={bannerColor}
+                              onChange={(e) => { setBannerColor(e.target.value); setBannerImage(null); }}
+                            />
+                          </label>
+                        </div>
+                        <button
+                          type="button"
+                          className="text-xs text-muted-foreground hover:text-foreground mt-1"
+                          onClick={() => setShowColorPicker(false)}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Avatar overlapping the banner */}
+                    <div className="absolute -bottom-10 left-4">
+                      <div
+                        className="relative group cursor-pointer"
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
+                          {avatarImage ? <AvatarImage src={avatarImage} /> : null}
+                          <AvatarFallback className="text-xl rounded-full">
+                            {name ? name.slice(0, 2).toUpperCase() : "AD"}
+                          </AvatarFallback>
+                          <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
+                        </Avatar>
+                        <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Camera className="h-5 w-5 text-white" />
+                        </div>
+                        <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card body */}
+                  <div className="pt-12 px-4 pb-4 space-y-1">
+                    <p className="font-bold text-base leading-none">{name || "Admin"}</p>
+                    <p className="text-xs text-muted-foreground">admin@acme.com</p>
+                    {bio && (
+                      <>
+                        <Separator className="my-3" />
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">About me</p>
+                          <p className="text-xs text-foreground leading-relaxed line-clamp-4">{bio}</p>
+                        </div>
+                      </>
+                    )}
+                    <Separator className="my-3" />
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                      <span className="text-xs text-muted-foreground">Online</span>
                     </div>
                   </div>
                 </div>
-
-                <div className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      This is your public display name.
-                    </p>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="admin@acme.com" />
-                    <p className="text-xs text-muted-foreground">
-                      You can manage verified email addresses in your email settings.
-                    </p>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="bio">Bio</Label>
-                    <Textarea
-                      id="bio"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Tell us a little bit about yourself"
-                      className="resize-none"
-                      rows={4}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      You can <span className="font-medium">@mention</span> other users and organizations.
-                    </p>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>URLs</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Add links to your website, blog, or social media profiles.
-                    </p>
-                    <Input placeholder="https://example.com" />
-                    <Input placeholder="https://twitter.com/username" />
-                  </div>
-                </div>
-                <Button>Update profile</Button>
               </div>
 
-              {/* Live Preview */}
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium">Preview</p>
-                  <p className="text-xs text-muted-foreground">This is how your profile looks to others.</p>
+              {/* Form */}
+              <div className="space-y-5">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Display name</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your name"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This is your public display name. Updates in the card in real time.
+                  </p>
                 </div>
-                <ProfilePreview
-                  name={name}
-                  bio={bio}
-                  bannerImage={bannerImage}
-                  bannerColor={bannerColor}
-                  avatarImage={avatarImage}
-                />
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" defaultValue="admin@acme.com" />
+                  <p className="text-xs text-muted-foreground">
+                    You can manage verified email addresses in your email settings.
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell us a little bit about yourself"
+                    className="resize-none"
+                    rows={4}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Shown below your name on the profile card.
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <Label>URLs</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Add links to your website, blog, or social media profiles.
+                  </p>
+                  <Input placeholder="https://example.com" />
+                  <Input placeholder="https://twitter.com/username" />
+                </div>
+                <Button>Save profile</Button>
               </div>
             </div>
           </TabsContent>
@@ -311,9 +269,7 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
                 <Input id="username" defaultValue="admin" placeholder="Username" />
-                <p className="text-xs text-muted-foreground">
-                  This is your public display name.
-                </p>
+                <p className="text-xs text-muted-foreground">This is your public display name.</p>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="language">Language</Label>
@@ -355,7 +311,7 @@ export default function SettingsPage() {
             <div>
               <h3 className="text-lg font-medium">Appearance</h3>
               <p className="text-sm text-muted-foreground">
-                Customize the appearance of the app. Automatically switch between day and night themes.
+                Customize the appearance of the app.
               </p>
             </div>
             <Separator />
@@ -372,32 +328,14 @@ export default function SettingsPage() {
                     <SelectItem value="system">System</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  Set the font you want to use in the dashboard.
-                </p>
               </div>
               <div className="grid gap-2">
                 <Label>Theme</Label>
-                <p className="text-xs text-muted-foreground">
-                  Select the theme for the dashboard.
-                </p>
                 <div className="grid grid-cols-3 gap-4">
                   {["Light", "Dark", "System"].map((theme) => (
                     <div key={theme} className="space-y-2">
-                      <div
-                        className={`rounded-md border-2 p-2 cursor-pointer hover:border-primary transition-colors ${
-                          theme === "Light" ? "border-primary" : "border-muted"
-                        }`}
-                      >
-                        <div
-                          className={`rounded h-16 ${
-                            theme === "Dark"
-                              ? "bg-zinc-900"
-                              : theme === "System"
-                              ? "bg-gradient-to-r from-white to-zinc-900"
-                              : "bg-white border"
-                          }`}
-                        />
+                      <div className={`rounded-md border-2 p-2 cursor-pointer hover:border-primary transition-colors ${theme === "Light" ? "border-primary" : "border-muted"}`}>
+                        <div className={`rounded h-16 ${theme === "Dark" ? "bg-zinc-900" : theme === "System" ? "bg-gradient-to-r from-white to-zinc-900" : "bg-white border"}`} />
                       </div>
                       <p className="text-xs text-center font-medium">{theme}</p>
                     </div>
@@ -412,9 +350,7 @@ export default function SettingsPage() {
           <TabsContent value="notifications" className="space-y-6">
             <div>
               <h3 className="text-lg font-medium">Notifications</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure how you receive notifications.
-              </p>
+              <p className="text-sm text-muted-foreground">Configure how you receive notifications.</p>
             </div>
             <Separator />
             <div className="space-y-4">
@@ -443,13 +379,7 @@ export default function SettingsPage() {
                 { label: "Nothing", description: "Don't receive any push notifications." },
               ].map((item, i) => (
                 <div key={item.label} className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="push"
-                    id={`push-${i}`}
-                    defaultChecked={i === 1}
-                    className="h-4 w-4 accent-primary"
-                  />
+                  <input type="radio" name="push" id={`push-${i}`} defaultChecked={i === 1} className="h-4 w-4 accent-primary" />
                   <Label htmlFor={`push-${i}`} className="cursor-pointer">
                     <span className="text-sm font-medium block">{item.label}</span>
                     <span className="text-xs text-muted-foreground">{item.description}</span>
@@ -464,9 +394,7 @@ export default function SettingsPage() {
           <TabsContent value="display" className="space-y-6">
             <div>
               <h3 className="text-lg font-medium">Display</h3>
-              <p className="text-sm text-muted-foreground">
-                Turn items on or off to control what's displayed in the app.
-              </p>
+              <p className="text-sm text-muted-foreground">Turn items on or off to control what's displayed in the app.</p>
             </div>
             <Separator />
             <div className="space-y-4">
@@ -490,9 +418,7 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label htmlFor="density">Interface density</Label>
                 <Select defaultValue="comfortable">
-                  <SelectTrigger id="density">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger id="density"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="comfortable">Comfortable</SelectItem>
                     <SelectItem value="compact">Compact</SelectItem>
