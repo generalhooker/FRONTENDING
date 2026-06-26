@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, ImagePlus, Pencil, X } from "lucide-react";
+import { ImagePlus, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BANNER_COLORS = [
@@ -29,7 +29,6 @@ export default function SettingsPage() {
   const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [bannerColor, setBannerColor] = useState(BANNER_COLORS[0]);
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
-  const [showColorPicker, setShowColorPicker] = useState(false);
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -38,7 +37,6 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setBannerImage(URL.createObjectURL(file));
-    setShowColorPicker(false);
     e.target.value = "";
   }
 
@@ -51,7 +49,7 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6 p-6 pb-16 max-w-4xl mx-auto">
+      <div className="space-y-6 p-6 pb-16 max-w-5xl mx-auto">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">
@@ -78,180 +76,169 @@ export default function SettingsPage() {
             </div>
             <Separator />
 
-            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 items-start">
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
 
-              {/* Profile Card — editable preview */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Profile card</p>
-                <p className="text-xs text-muted-foreground">Click to edit directly.</p>
-
-                <div className="rounded-xl overflow-visible border bg-card shadow-lg w-72">
-                  {/* Banner — clickable to edit */}
-                  <div className="relative">
-                    <div
-                      className="h-28 rounded-t-xl cursor-pointer group relative overflow-hidden"
-                      style={
-                        bannerImage
-                          ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-                          : { backgroundColor: bannerColor }
-                      }
-                      onClick={() => setShowColorPicker((v) => !v)}
-                    >
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                        <button
-                          type="button"
-                          className="bg-black/60 text-white rounded-md px-2 py-1 text-xs flex items-center gap-1 hover:bg-black/80 transition"
-                          onClick={(e) => { e.stopPropagation(); bannerInputRef.current?.click(); }}
-                        >
-                          <ImagePlus className="h-3 w-3" /> Upload
-                        </button>
-                        <button
-                          type="button"
-                          className="bg-black/60 text-white rounded-md px-2 py-1 text-xs flex items-center gap-1 hover:bg-black/80 transition"
-                          onClick={(e) => { e.stopPropagation(); setShowColorPicker((v) => !v); }}
-                        >
-                          <Pencil className="h-3 w-3" /> Color
-                        </button>
-                        {bannerImage && (
-                          <button
-                            type="button"
-                            className="bg-black/60 text-white rounded-full p-1 hover:bg-black/80 transition"
-                            onClick={(e) => { e.stopPropagation(); setBannerImage(null); }}
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+              {/* ── Left: read-only profile card ── */}
+              <div className="shrink-0 space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Preview</p>
+                <div className="rounded-xl overflow-visible border bg-card shadow-md w-64">
+                  {/* Banner */}
+                  <div
+                    className="h-24 rounded-t-xl"
+                    style={
+                      bannerImage
+                        ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                        : { backgroundColor: bannerColor }
+                    }
+                  />
+                  {/* Avatar overlapping banner */}
+                  <div className="relative px-4 pb-4">
+                    <div className="absolute -top-10">
+                      <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
+                        {avatarImage ? <AvatarImage src={avatarImage} /> : null}
+                        <AvatarFallback className="text-xl rounded-full">
+                          {name ? name.slice(0, 2).toUpperCase() : "AD"}
+                        </AvatarFallback>
+                        <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
+                      </Avatar>
                     </div>
-
-                    {/* Color picker popover */}
-                    {showColorPicker && (
-                      <div className="absolute left-2 top-full mt-2 z-50 bg-popover border rounded-lg p-3 shadow-xl space-y-2 w-64">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Banner color</p>
-                        <div className="flex gap-2 flex-wrap">
-                          {BANNER_COLORS.map((color) => (
-                            <button
-                              key={color}
-                              type="button"
-                              className={cn(
-                                "h-8 w-8 rounded-full border-2 transition-transform hover:scale-110",
-                                bannerColor === color && !bannerImage ? "border-foreground scale-110" : "border-transparent"
-                              )}
-                              style={{ backgroundColor: color }}
-                              onClick={() => { setBannerColor(color); setBannerImage(null); }}
-                            />
-                          ))}
-                          <label
-                            className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-foreground transition-colors"
-                            title="Custom color"
-                          >
-                            <Pencil className="h-3 w-3 text-muted-foreground" />
-                            <input
-                              type="color"
-                              className="sr-only"
-                              value={bannerColor}
-                              onChange={(e) => { setBannerColor(e.target.value); setBannerImage(null); }}
-                            />
-                          </label>
-                        </div>
-                        <button
-                          type="button"
-                          className="text-xs text-muted-foreground hover:text-foreground mt-1"
-                          onClick={() => setShowColorPicker(false)}
-                        >
-                          Close
-                        </button>
+                    <div className="pt-12 space-y-1">
+                      <p className="font-bold text-base leading-none">{name || "Admin"}</p>
+                      <p className="text-xs text-muted-foreground">admin@acme.com</p>
+                      {bio && (
+                        <>
+                          <Separator className="my-3" />
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">About me</p>
+                            <p className="text-xs text-foreground leading-relaxed line-clamp-4">{bio}</p>
+                          </div>
+                        </>
+                      )}
+                      <Separator className="my-3" />
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                        <span className="text-xs text-muted-foreground">Online</span>
                       </div>
-                    )}
-
-                    {/* Avatar overlapping the banner */}
-                    <div className="absolute -bottom-10 left-4">
-                      <div
-                        className="relative group cursor-pointer"
-                        onClick={() => avatarInputRef.current?.click()}
-                      >
-                        <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
-                          {avatarImage ? <AvatarImage src={avatarImage} /> : null}
-                          <AvatarFallback className="text-xl rounded-full">
-                            {name ? name.slice(0, 2).toUpperCase() : "AD"}
-                          </AvatarFallback>
-                          <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
-                        </Avatar>
-                        <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <Camera className="h-5 w-5 text-white" />
-                        </div>
-                        <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card body */}
-                  <div className="pt-12 px-4 pb-4 space-y-1">
-                    <p className="font-bold text-base leading-none">{name || "Admin"}</p>
-                    <p className="text-xs text-muted-foreground">admin@acme.com</p>
-                    {bio && (
-                      <>
-                        <Separator className="my-3" />
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">About me</p>
-                          <p className="text-xs text-foreground leading-relaxed line-clamp-4">{bio}</p>
-                        </div>
-                      </>
-                    )}
-                    <Separator className="my-3" />
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-                      <span className="text-xs text-muted-foreground">Online</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Form */}
-              <div className="space-y-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Display name</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This is your public display name. Updates in the card in real time.
-                  </p>
+              {/* ── Right: edit card ── */}
+              <div className="flex-1 rounded-xl border bg-card shadow-md p-5 space-y-5">
+                <p className="text-sm font-semibold">Edit Profile</p>
+                <Separator />
+
+                {/* Banner */}
+                <div className="space-y-2">
+                  <Label>Banner</Label>
+                  <div
+                    className="relative h-28 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/30 cursor-pointer group"
+                    style={
+                      bannerImage
+                        ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center", border: "none" }
+                        : { backgroundColor: bannerColor }
+                    }
+                    onClick={() => bannerInputRef.current?.click()}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 group-hover:bg-black/30 transition-colors opacity-0 group-hover:opacity-100">
+                      <span className="bg-black/60 text-white text-xs rounded-md px-2 py-1 flex items-center gap-1">
+                        <ImagePlus className="h-3 w-3" /> Upload image
+                      </span>
+                      {bannerImage && (
+                        <button
+                          type="button"
+                          className="bg-black/60 text-white rounded-full p-1 hover:bg-destructive transition"
+                          onClick={(e) => { e.stopPropagation(); setBannerImage(null); }}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                    <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                  </div>
+
+                  {/* Color swatches */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs text-muted-foreground mr-1">Color:</span>
+                    {BANNER_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={cn(
+                          "h-6 w-6 rounded-full border-2 transition-transform hover:scale-110",
+                          bannerColor === color && !bannerImage ? "border-foreground scale-110" : "border-transparent"
+                        )}
+                        style={{ backgroundColor: color }}
+                        onClick={() => { setBannerColor(color); setBannerImage(null); }}
+                      />
+                    ))}
+                    <label className="h-6 w-6 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-foreground transition-colors" title="Custom color">
+                      <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      <input
+                        type="color"
+                        className="sr-only"
+                        value={bannerColor}
+                        onChange={(e) => { setBannerColor(e.target.value); setBannerImage(null); }}
+                      />
+                    </label>
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="admin@acme.com" />
-                  <p className="text-xs text-muted-foreground">
-                    You can manage verified email addresses in your email settings.
-                  </p>
+
+                {/* Avatar */}
+                <div className="space-y-2">
+                  <Label>Profile picture</Label>
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-14 w-14">
+                      {avatarImage ? <AvatarImage src={avatarImage} /> : null}
+                      <AvatarFallback>{name ? name.slice(0, 2).toUpperCase() : "AD"}</AvatarFallback>
+                      <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
+                    </Avatar>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" type="button" onClick={() => avatarInputRef.current?.click()}>
+                        Change photo
+                      </Button>
+                      {avatarImage && (
+                        <Button variant="ghost" size="sm" type="button" onClick={() => setAvatarImage(null)}>
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder="Tell us a little bit about yourself"
-                    className="resize-none"
-                    rows={4}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Shown below your name on the profile card.
-                  </p>
+
+                <Separator />
+
+                {/* Fields */}
+                <div className="grid gap-4">
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="name">Display name</Label>
+                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" defaultValue="admin@acme.com" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder="Tell us a little bit about yourself"
+                      className="resize-none"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Links</Label>
+                    <Input placeholder="https://example.com" />
+                    <Input placeholder="https://twitter.com/username" />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label>URLs</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Add links to your website, blog, or social media profiles.
-                  </p>
-                  <Input placeholder="https://example.com" />
-                  <Input placeholder="https://twitter.com/username" />
-                </div>
-                <Button>Save profile</Button>
+
+                <Button className="w-full">Save profile</Button>
               </div>
             </div>
           </TabsContent>
@@ -260,23 +247,18 @@ export default function SettingsPage() {
           <TabsContent value="account" className="space-y-6">
             <div>
               <h3 className="text-lg font-medium">Account</h3>
-              <p className="text-sm text-muted-foreground">
-                Update your account settings. Set your preferred language and timezone.
-              </p>
+              <p className="text-sm text-muted-foreground">Update your account settings.</p>
             </div>
             <Separator />
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" defaultValue="admin" placeholder="Username" />
-                <p className="text-xs text-muted-foreground">This is your public display name.</p>
+                <Input id="username" defaultValue="admin" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="language">Language</Label>
                 <Select defaultValue="en">
-                  <SelectTrigger id="language">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
+                  <SelectTrigger id="language"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="pt">Portuguese</SelectItem>
@@ -285,9 +267,6 @@ export default function SettingsPage() {
                     <SelectItem value="de">German</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  This is the language that will be used in the dashboard.
-                </p>
               </div>
             </div>
             <div className="space-y-4">
@@ -296,9 +275,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Delete account</p>
-                  <p className="text-xs text-muted-foreground">
-                    Permanently delete your account and all of its contents.
-                  </p>
+                  <p className="text-xs text-muted-foreground">Permanently delete your account.</p>
                 </div>
                 <Button variant="destructive" size="sm">Delete account</Button>
               </div>
@@ -310,18 +287,14 @@ export default function SettingsPage() {
           <TabsContent value="appearance" className="space-y-6">
             <div>
               <h3 className="text-lg font-medium">Appearance</h3>
-              <p className="text-sm text-muted-foreground">
-                Customize the appearance of the app.
-              </p>
+              <p className="text-sm text-muted-foreground">Customize the appearance of the app.</p>
             </div>
             <Separator />
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="font">Font</Label>
                 <Select defaultValue="inter">
-                  <SelectTrigger id="font">
-                    <SelectValue placeholder="Select font" />
-                  </SelectTrigger>
+                  <SelectTrigger id="font"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="inter">Inter</SelectItem>
                     <SelectItem value="manrope">Manrope</SelectItem>
@@ -394,7 +367,7 @@ export default function SettingsPage() {
           <TabsContent value="display" className="space-y-6">
             <div>
               <h3 className="text-lg font-medium">Display</h3>
-              <p className="text-sm text-muted-foreground">Turn items on or off to control what's displayed in the app.</p>
+              <p className="text-sm text-muted-foreground">Control what's displayed in the app.</p>
             </div>
             <Separator />
             <div className="space-y-4">
@@ -413,19 +386,16 @@ export default function SettingsPage() {
               ))}
             </div>
             <Separator />
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Density</h4>
-              <div className="grid gap-2">
-                <Label htmlFor="density">Interface density</Label>
-                <Select defaultValue="comfortable">
-                  <SelectTrigger id="density"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="comfortable">Comfortable</SelectItem>
-                    <SelectItem value="compact">Compact</SelectItem>
-                    <SelectItem value="spacious">Spacious</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-2">
+              <Label htmlFor="density">Interface density</Label>
+              <Select defaultValue="comfortable">
+                <SelectTrigger id="density"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="comfortable">Comfortable</SelectItem>
+                  <SelectItem value="compact">Compact</SelectItem>
+                  <SelectItem value="spacious">Spacious</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button>Update display</Button>
           </TabsContent>
