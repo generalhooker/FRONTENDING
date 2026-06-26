@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { AppLayout } from "@/components/dashboard/app-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,12 +14,100 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ImagePlus, Pencil, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const BANNER_COLORS = [
+  "#5865F2", "#57F287", "#FEE75C", "#EB459E",
+  "#ED4245", "#1ABC9C", "#E67E22", "#9B59B6",
+];
+
+function ProfilePreview({
+  name,
+  bio,
+  bannerImage,
+  bannerColor,
+  avatarImage,
+}: {
+  name: string;
+  bio: string;
+  bannerImage: string | null;
+  bannerColor: string;
+  avatarImage: string | null;
+}) {
+  return (
+    <div className="rounded-xl overflow-hidden border bg-card shadow-lg w-full max-w-xs">
+      <div
+        className="h-24 relative"
+        style={
+          bannerImage
+            ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { backgroundColor: bannerColor }
+        }
+      />
+      <div className="px-4 pb-4">
+        <div className="relative -mt-10 mb-3 w-fit">
+          <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
+            {avatarImage ? (
+              <AvatarImage src={avatarImage} />
+            ) : null}
+            <AvatarFallback className="text-xl rounded-full">
+              {name ? name.slice(0, 2).toUpperCase() : "AD"}
+            </AvatarFallback>
+            <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
+          </Avatar>
+        </div>
+        <div className="space-y-1">
+          <p className="font-bold text-base leading-none">{name || "Admin"}</p>
+          <p className="text-xs text-muted-foreground">admin@acme.com</p>
+        </div>
+        {bio && (
+          <>
+            <Separator className="my-3" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">About me</p>
+              <p className="text-xs text-foreground leading-relaxed line-clamp-4">{bio}</p>
+            </div>
+          </>
+        )}
+        <Separator className="my-3" />
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+          <span className="text-xs text-muted-foreground">Online</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
+  const [name, setName] = useState("Admin");
+  const [bio, setBio] = useState("");
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [bannerColor, setBannerColor] = useState(BANNER_COLORS[0]);
+  const [avatarImage, setAvatarImage] = useState<string | null>(null);
+
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setBannerImage(url);
+  }
+
+  function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setAvatarImage(url);
+  }
+
   return (
     <AppLayout>
-      <div className="space-y-6 p-6 pb-16 max-w-3xl mx-auto">
+      <div className="space-y-6 p-6 pb-16 max-w-4xl mx-auto">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">
@@ -44,54 +133,169 @@ export default function SettingsPage() {
               </p>
             </div>
             <Separator />
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-lg">AD</AvatarFallback>
-                <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
-              </Avatar>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Profile picture</p>
-                <p className="text-xs text-muted-foreground">JPG, GIF or PNG. Max size 1MB.</p>
-                <Button variant="outline" size="sm">Change picture</Button>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8">
+              {/* Form */}
+              <div className="space-y-6">
+                {/* Banner */}
+                <div className="grid gap-2">
+                  <Label>Banner</Label>
+                  <div
+                    className="relative h-32 rounded-lg overflow-hidden border cursor-pointer group"
+                    style={
+                      bannerImage
+                        ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                        : { backgroundColor: bannerColor }
+                    }
+                    onClick={() => bannerInputRef.current?.click()}
+                  >
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                      <Button size="sm" variant="secondary" type="button" onClick={(e) => { e.stopPropagation(); bannerInputRef.current?.click(); }}>
+                        <ImagePlus className="h-4 w-4 mr-1" /> Upload image
+                      </Button>
+                      {bannerImage && (
+                        <Button size="sm" variant="destructive" type="button" onClick={(e) => { e.stopPropagation(); setBannerImage(null); }}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <input
+                      ref={bannerInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleBannerUpload}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground">Or pick a color:</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {BANNER_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          className={cn(
+                            "h-7 w-7 rounded-full border-2 transition-transform hover:scale-110",
+                            bannerColor === color && !bannerImage ? "border-foreground scale-110" : "border-transparent"
+                          )}
+                          style={{ backgroundColor: color }}
+                          onClick={() => { setBannerColor(color); setBannerImage(null); }}
+                        />
+                      ))}
+                      <label className="h-7 w-7 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center cursor-pointer hover:border-foreground transition-colors" title="Custom color">
+                        <Pencil className="h-3 w-3 text-muted-foreground" />
+                        <input
+                          type="color"
+                          className="sr-only"
+                          value={bannerColor}
+                          onChange={(e) => { setBannerColor(e.target.value); setBannerImage(null); }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Avatar */}
+                <div className="grid gap-2">
+                  <Label>Profile picture</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
+                      <Avatar className="h-16 w-16">
+                        {avatarImage ? <AvatarImage src={avatarImage} /> : null}
+                        <AvatarFallback className="text-lg">
+                          {name ? name.slice(0, 2).toUpperCase() : "AD"}
+                        </AvatarFallback>
+                        <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
+                      </Avatar>
+                      <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Pencil className="h-4 w-4 text-white" />
+                      </div>
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Upload a photo</p>
+                      <p className="text-xs text-muted-foreground">JPG, GIF or PNG. Max size 1MB.</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" type="button" onClick={() => avatarInputRef.current?.click()}>
+                          Change picture
+                        </Button>
+                        {avatarImage && (
+                          <Button variant="ghost" size="sm" type="button" onClick={() => setAvatarImage(null)}>
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This is your public display name.
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" defaultValue="admin@acme.com" />
+                    <p className="text-xs text-muted-foreground">
+                      You can manage verified email addresses in your email settings.
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder="Tell us a little bit about yourself"
+                      className="resize-none"
+                      rows={4}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      You can <span className="font-medium">@mention</span> other users and organizations.
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>URLs</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Add links to your website, blog, or social media profiles.
+                    </p>
+                    <Input placeholder="https://example.com" />
+                    <Input placeholder="https://twitter.com/username" />
+                  </div>
+                </div>
+                <Button>Update profile</Button>
               </div>
-            </div>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Admin" placeholder="Your name" />
-                <p className="text-xs text-muted-foreground">
-                  This is your public display name. It can be your real name or a pseudonym.
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="admin@acme.com" />
-                <p className="text-xs text-muted-foreground">
-                  You can manage verified email addresses in your email settings.
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  placeholder="Tell us a little bit about yourself"
-                  className="resize-none"
-                  rows={4}
+
+              {/* Live Preview */}
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium">Preview</p>
+                  <p className="text-xs text-muted-foreground">This is how your profile looks to others.</p>
+                </div>
+                <ProfilePreview
+                  name={name}
+                  bio={bio}
+                  bannerImage={bannerImage}
+                  bannerColor={bannerColor}
+                  avatarImage={avatarImage}
                 />
-                <p className="text-xs text-muted-foreground">
-                  You can <span className="font-medium">@mention</span> other users and organizations.
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label>URLs</Label>
-                <p className="text-xs text-muted-foreground">
-                  Add links to your website, blog, or social media profiles.
-                </p>
-                <Input placeholder="https://example.com" />
-                <Input placeholder="https://twitter.com/username" />
               </div>
             </div>
-            <Button>Update profile</Button>
           </TabsContent>
 
           {/* Account Tab */}
