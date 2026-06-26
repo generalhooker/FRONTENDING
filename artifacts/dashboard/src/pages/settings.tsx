@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 
 export default function SettingsPage() {
   return (
@@ -47,6 +47,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
                 <AvatarFallback className="text-lg">AD</AvatarFallback>
+                <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
               </Avatar>
               <div className="space-y-1">
                 <p className="text-sm font-medium">Profile picture</p>

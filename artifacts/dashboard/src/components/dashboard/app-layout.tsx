@@ -162,7 +162,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Perfil</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">Perfil</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/settings">Configurações</Link>
                   </DropdownMenuItem>
