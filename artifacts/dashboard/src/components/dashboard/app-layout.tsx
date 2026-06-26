@@ -13,7 +13,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -70,7 +70,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
-                <a href="/">
+                <Link to="/">
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <GalleryVerticalEnd className="size-4" />
                   </div>
@@ -78,7 +78,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <span className="font-semibold">Acme Inc.</span>
                     <span className="text-xs text-muted-foreground">Enterprise</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -95,10 +95,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       isActive={location === item.href}
                       tooltip={item.label}
                     >
-                      <a href={item.href}>
+                      <Link to={item.href}>
                         <item.icon />
                         <span>{item.label}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -161,8 +161,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Perfil</DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <a href="/settings">Configurações</a>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">Configurações</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive">Sair</DropdownMenuItem>
