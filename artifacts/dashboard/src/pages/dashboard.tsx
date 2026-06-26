@@ -4,13 +4,11 @@ import {
   Bell,
   CreditCard,
   DollarSign,
-  Home,
   LayoutDashboard,
   LogOut,
   Menu,
   Moon,
   Package,
-  Search,
   Settings,
   ShoppingCart,
   Sun,
@@ -18,7 +16,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -76,13 +73,7 @@ export default function DashboardPage() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between px-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-              <Home className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-sidebar-foreground">Acme Inc</span>
-          </div>
+        <div className="flex h-16 items-center justify-end px-4 border-b border-sidebar-border">
           <Button
             variant="ghost"
             size="icon"
@@ -133,17 +124,6 @@ export default function DashboardPage() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-
-          <div className="flex-1 max-w-sm">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Pesquisar..."
-                className="pl-8 bg-muted/40 border-0 focus-visible:ring-1"
-              />
-            </div>
-          </div>
 
           <div className="flex items-center gap-2 ml-auto">
             <Button variant="ghost" size="icon" onClick={toggleDark}>
