@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -134,6 +134,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   >
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarFallback className="rounded-lg">AD</AvatarFallback>
+                      <AvatarBadge className="bg-green-500 dark:bg-green-400 size-2 ring-sidebar" />
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">Admin</span>
@@ -152,6 +153,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarFallback className="rounded-lg">AD</AvatarFallback>
+                        <AvatarBadge className="bg-green-500 dark:bg-green-400 size-2" />
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">Admin</span>
