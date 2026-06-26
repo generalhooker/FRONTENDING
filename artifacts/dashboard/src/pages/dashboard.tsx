@@ -13,7 +13,6 @@ import {
   ShoppingCart,
   Sun,
   Users,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,17 +72,6 @@ export default function DashboardPage() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-end px-4 border-b border-sidebar-border">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden text-sidebar-foreground"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {navItems.map((item) => (
             <button
