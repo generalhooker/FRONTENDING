@@ -13,10 +13,37 @@ import {
   CommandShortcut
 } from '@/components/ui/command'
 import { Button } from '@/components/ui/button'
-import { HomeIcon, InboxIcon, FileTextIcon, FolderIcon, PlusIcon, FolderPlusIcon, CopyIcon, ScissorsIcon, ClipboardPasteIcon, TrashIcon, LayoutGridIcon, ListIcon, ZoomInIcon, ZoomOutIcon, UserIcon, CreditCardIcon, SettingsIcon, BellIcon, HelpCircleIcon, CalculatorIcon, CalendarIcon, ImageIcon, CodeIcon } from 'lucide-react'
+import { HomeIcon, InboxIcon, FileTextIcon, FolderIcon, PlusIcon, FolderPlusIcon, CopyIcon, ScissorsIcon, ClipboardPasteIcon, TrashIcon, LayoutGridIcon, ListIcon, ZoomInIcon, ZoomOutIcon, UserIcon, CreditCardIcon, SettingsIcon, BellIcon, HelpCircleIcon, CalculatorIcon, CalendarIcon, ImageIcon, CodeIcon, Maximize, Minimize } from 'lucide-react'
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {})
+  } else {
+    document.exitFullscreen().catch(() => {})
+  }
+}
 
 const CommandScrollable = () => {
   const [open, setOpen] = React.useState(false)
+  const [isFullscreen, setIsFullscreen] = React.useState(!!document.fullscreenElement)
+
+  React.useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', handler)
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'F11') {
+        e.preventDefault()
+        toggleFullscreen()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handler)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [])
 
   return (
     <div className='flex flex-col gap-4'>
@@ -85,6 +112,11 @@ const CommandScrollable = () => {
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup heading='View'>
+              <CommandItem onSelect={() => { toggleFullscreen(); setOpen(false) }}>
+                {isFullscreen ? <Minimize /> : <Maximize />}
+                <span>{isFullscreen ? 'Exit Full Screen' : 'Full Screen'}</span>
+                <CommandShortcut>F11</CommandShortcut>
+              </CommandItem>
               <CommandItem>
                 <LayoutGridIcon />
                 <span>Grid View</span>
