@@ -214,11 +214,13 @@ export default function DashboardPage() {
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Documents</span>
             </div>
-            <CommandMenu />
-            <Button variant="outline" size="sm" className="gap-2">
-              <Github className="h-3.5 w-3.5" />
-              GitHub
-            </Button>
+            <div className="flex items-center gap-2">
+              <CommandMenu />
+              <Button variant="outline" size="sm" className="gap-2">
+                <Github className="h-3.5 w-3.5" />
+                GitHub
+              </Button>
+            </div>
           </div>
         </header>
 
