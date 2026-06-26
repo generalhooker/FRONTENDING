@@ -1,8 +1,6 @@
 import {
   BarChart3,
   BookOpen,
-  ChevronRight,
-  CirclePlus,
   Database,
   FileText,
   GalleryVerticalEnd,
@@ -54,8 +52,7 @@ import {
 import { VisitorsChart } from "@/components/dashboard/visitors-chart";
 
 const navMain = [
-  { icon: CirclePlus, label: "Quick Create", active: true },
-  { icon: LayoutDashboard, label: "Dashboard" },
+  { icon: LayoutDashboard, label: "Dashboard", active: true },
   { icon: RefreshCcw, label: "Lifecycle" },
   { icon: BarChart3, label: "Analytics" },
   { icon: FileText, label: "Projects" },
