@@ -156,4 +156,4 @@ const CommandScrollable = () => {
   )
 }
 
-export { CommandScrollable as CommandMenu }
+export default CommandScrollable
