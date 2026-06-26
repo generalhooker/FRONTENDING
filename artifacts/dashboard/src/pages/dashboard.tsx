@@ -50,7 +50,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { VisitorsChart } from "@/components/dashboard/visitors-chart";
-import { CommandSearch } from "@/components/dashboard/command-search";
 
 const navMain = [
   { icon: LayoutDashboard, label: "Dashboard", active: true },
@@ -214,13 +213,10 @@ export default function DashboardPage() {
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Documents</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CommandSearch />
-              <Button variant="outline" size="sm" className="gap-2">
-                <Github className="h-3.5 w-3.5" />
-                GitHub
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Github className="h-3.5 w-3.5" />
+              GitHub
+            </Button>
           </div>
         </header>
 
