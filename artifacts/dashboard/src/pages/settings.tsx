@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ImagePlus, Pencil, X } from "lucide-react";
+import { ImagePlus, Pencil, User, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BANNER_COLORS = [
@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [name, setName] = useState("Admin");
   const [bio, setBio] = useState("");
-  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [bannerImage, setBannerImage] = useState<string | null>("/banner.png");
   const [bannerColor, setBannerColor] = useState(BANNER_COLORS[0]);
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
 
@@ -98,8 +98,8 @@ export default function SettingsPage() {
                     <div className="absolute -top-10">
                       <Avatar className="h-20 w-20 ring-4 ring-card rounded-full">
                         {avatarImage ? <AvatarImage src={avatarImage} /> : null}
-                        <AvatarFallback className="text-xl rounded-full">
-                          {name ? name.slice(0, 2).toUpperCase() : "AD"}
+                        <AvatarFallback className="text-xl rounded-full bg-white">
+                          <User className="h-10 w-10 text-black" />
                         </AvatarFallback>
                         <AvatarBadge className="bg-green-500 dark:bg-green-400 size-4 ring-card" />
                       </Avatar>
@@ -193,7 +193,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14">
                       {avatarImage ? <AvatarImage src={avatarImage} /> : null}
-                      <AvatarFallback>{name ? name.slice(0, 2).toUpperCase() : "AD"}</AvatarFallback>
+                      <AvatarFallback className="bg-white"><User className="h-7 w-7 text-black" /></AvatarFallback>
                       <AvatarBadge className="bg-green-500 dark:bg-green-400 size-3" />
                     </Avatar>
                     <div className="flex gap-2">
