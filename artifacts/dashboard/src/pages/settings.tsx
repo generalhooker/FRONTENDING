@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useTheme } from "@/lib/theme";
+import { useProfile, BANNER_COLORS } from "@/lib/profile";
 import { AppLayout } from "@/components/dashboard/app-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,18 +20,9 @@ import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/u
 import { ImagePlus, Pencil, User, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const BANNER_COLORS = [
-  "#5865F2", "#57F287", "#FEE75C", "#EB459E",
-  "#ED4245", "#1ABC9C", "#E67E22", "#9B59B6",
-];
-
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const [name, setName] = useState("Admin");
-  const [bio, setBio] = useState("");
-  const [bannerImage, setBannerImage] = useState<string | null>("/banner.png");
-  const [bannerColor, setBannerColor] = useState(BANNER_COLORS[0]);
-  const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const { name, setName, bio, setBio, bannerImage, setBannerImage, bannerColor, setBannerColor, avatarImage, setAvatarImage } = useProfile();
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);

@@ -1,29 +1,33 @@
 import { AppLayout } from "@/components/dashboard/app-layout";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarBadge, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Mail, MapPin, Link as LinkIcon, Calendar, Settings } from "lucide-react";
 import { Link } from "wouter";
+import { useProfile } from "@/lib/profile";
 
 export default function ProfilePage() {
+  const { name, bio, bannerImage, bannerColor, avatarImage } = useProfile();
+
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto pb-16">
         {/* Banner */}
         <div
-          className="h-48 w-full rounded-b-none"
-          style={{
-            backgroundImage: "url(/banner.png)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          className="h-48 w-full"
+          style={
+            bannerImage
+              ? { backgroundImage: `url(${bannerImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+              : { backgroundColor: bannerColor }
+          }
         />
 
         {/* Avatar + actions row */}
         <div className="px-6 pb-4 border-b">
           <div className="flex items-end justify-between -mt-12 mb-4">
             <Avatar className="h-24 w-24 ring-4 ring-background rounded-full">
+              {avatarImage ? <AvatarImage src={avatarImage} /> : null}
               <AvatarFallback className="rounded-full bg-white">
                 <User className="h-12 w-12 text-black" />
               </AvatarFallback>
@@ -41,8 +45,8 @@ export default function ProfilePage() {
 
           {/* Name & meta */}
           <div className="space-y-1">
-            <h1 className="text-xl font-bold leading-none">Admin</h1>
-            <p className="text-sm text-muted-foreground">@admin</p>
+            <h1 className="text-xl font-bold leading-none">{name || "Admin"}</h1>
+            <p className="text-sm text-muted-foreground">@{(name || "admin").toLowerCase().replace(/\s+/g, "")}</p>
           </div>
 
           {/* Status badges */}
@@ -63,7 +67,7 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-sm font-semibold mb-2">Sobre</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Administrador da plataforma. Gerencia configurações, equipe e relatórios.
+                {bio || "Administrador da plataforma. Gerencia configurações, equipe e relatórios."}
               </p>
             </div>
 
